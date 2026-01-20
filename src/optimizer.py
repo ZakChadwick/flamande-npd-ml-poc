@@ -10,7 +10,7 @@ import numpy as np
 from itertools import product as itertools_product
 
 
-class NPDOptimizer: 
+class NPDOptimizer:
     """
     Product concept optimizer
     
@@ -22,8 +22,8 @@ class NPDOptimizer:
         """
         Initialize optimizer with trained predictor
         
-        Args: 
-            predictor:  Trained NPDPredictor instance
+        Args:
+            predictor: Trained NPDPredictor instance
         """
         self.predictor = predictor
         
@@ -43,7 +43,7 @@ class NPDOptimizer:
         """
         Find best modifications to improve success probability
         
-        Args: 
+        Args:
             base_concept: dict with current product attributes
             constraints: dict with optimization constraints
             top_n: Number of top recommendations to return
@@ -55,8 +55,8 @@ class NPDOptimizer:
             constraints = {}
         
         # Get baseline probability
-        baseline_prob = self. predict_success(base_concept)
-        
+        baseline_prob = self.predict_success(base_concept)
+
         recommendations = []
         
         # Test preparation variations
@@ -67,7 +67,7 @@ class NPDOptimizer:
                     test_concept['preparation'] = prep
                     prob = self.predict_success(test_concept)
                     
-                    if prob > baseline_prob: 
+                    if prob > baseline_prob:
                         recommendations.append({
                             'change': f"Change preparation to '{prep}'",
                             'category': 'preparation',
@@ -94,17 +94,17 @@ class NPDOptimizer:
                             'baseline_probability': baseline_prob,
                             'new_probability': prob,
                             'lift': prob - baseline_prob,
-                            'relative_lift_pct':  ((prob - baseline_prob) / baseline_prob) * 100
+                            'relative_lift_pct': ((prob - baseline_prob) / baseline_prob) * 100
                         })
         
         # Test price point variations
         if not constraints.get('fixed_price'):
-            for price in ['economy', 'mid-range', 'premium']: 
+            for price in ['economy', 'mid-range', 'premium']:
                 if price != base_concept.get('price_point'):
                     test_concept = base_concept.copy()
                     test_concept['price_point'] = price
-                    prob = self. predict_success(test_concept)
-                    
+                    prob = self.predict_success(test_concept)
+
                     if prob > baseline_prob:
                         recommendations.append({
                             'change': f"Reposition as '{price}' price point",
@@ -117,19 +117,19 @@ class NPDOptimizer:
                         })
         
         # Test target channel variations
-        if not constraints. get('fixed_channel'):
-            for channel in ['food_service', 'retail_butcher', 'supermarket', 'direct']: 
+        if not constraints.get('fixed_channel'):
+            for channel in ['food_service', 'retail_butcher', 'supermarket', 'direct']:
                 if channel != base_concept.get('target_channel'):
                     test_concept = base_concept.copy()
                     test_concept['target_channel'] = channel
-                    prob = self. predict_success(test_concept)
-                    
+                    prob = self.predict_success(test_concept)
+
                     if prob > baseline_prob:
                         recommendations.append({
-                            'change': f"Target '{channel. replace('_', ' ')}' channel",
-                            'category':  'target_channel',
+                            'change': f"Target '{channel.replace('_', ' ')}' channel",
+                            'category': 'target_channel',
                             'new_value': channel,
-                            'baseline_probability':  baseline_prob,
+                            'baseline_probability': baseline_prob,
                             'new_probability': prob,
                             'lift': prob - baseline_prob,
                             'relative_lift_pct': ((prob - baseline_prob) / baseline_prob) * 100
@@ -144,12 +144,12 @@ class NPDOptimizer:
             if prob > baseline_prob:
                 recommendations.append({
                     'change': "Add sustainability claim",
-                    'category':  'sustainability',
-                    'new_value':  1,
+                    'category': 'sustainability',
+                    'new_value': 1,
                     'baseline_probability': baseline_prob,
                     'new_probability': prob,
                     'lift': prob - baseline_prob,
-                    'relative_lift_pct':  ((prob - baseline_prob) / baseline_prob) * 100
+                    'relative_lift_pct': ((prob - baseline_prob) / baseline_prob) * 100
                 })
         
         # Test adding origin story
@@ -158,7 +158,7 @@ class NPDOptimizer:
             test_concept['has_origin_story'] = 1
             prob = self.predict_success(test_concept)
             
-            if prob > baseline_prob: 
+            if prob > baseline_prob:
                 recommendations.append({
                     'change': "Add origin/authenticity story",
                     'category': 'origin_story',
@@ -191,7 +191,7 @@ class NPDOptimizer:
         current_marketing = base_concept.get('marketing_spend_gbp', 0)
         
         if current_marketing > 0:
-            for increase_pct in [25, 50]: 
+            for increase_pct in [25, 50]:
                 if increase_pct <= max_marketing_increase:
                     test_concept = base_concept.copy()
                     new_marketing = int(current_marketing * (1 + increase_pct/100))
@@ -200,8 +200,8 @@ class NPDOptimizer:
                     
                     if prob > baseline_prob:
                         recommendations.append({
-                            'change': f"Increase marketing spend by {increase_pct}% (to £{new_marketing: ,})",
-                            'category':  'marketing_spend',
+                            'change': f"Increase marketing budget by {increase_pct}%",
+                            'category': 'marketing',
                             'new_value': new_marketing,
                             'baseline_probability': baseline_prob,
                             'new_probability': prob,
@@ -210,31 +210,11 @@ class NPDOptimizer:
                             'investment_required': new_marketing - current_marketing
                         })
         
-        # Test extending shelf life
-        current_shelf_life = base_concept.get('shelf_life_days', 7)
-        for extension in [3, 7, 14]:
-            new_shelf_life = current_shelf_life + extension
-            if new_shelf_life <= 21:  # Max realistic shelf life
-                test_concept = base_concept.copy()
-                test_concept['shelf_life_days'] = new_shelf_life
-                prob = self.predict_success(test_concept)
-                
-                if prob > baseline_prob:
-                    recommendations.append({
-                        'change': f"Extend shelf life by {extension} days (to {new_shelf_life} days)",
-                        'category':  'shelf_life',
-                        'new_value': new_shelf_life,
-                        'baseline_probability': baseline_prob,
-                        'new_probability':  prob,
-                        'lift':  prob - baseline_prob,
-                        'relative_lift_pct': ((prob - baseline_prob) / baseline_prob) * 100
-                    })
-        
-        # Sort by impact (lift)
+        # Sort by lift and return top N
         recommendations.sort(key=lambda x: x['lift'], reverse=True)
         
-        return recommendations[: top_n]
-    
+        return recommendations[:top_n]
+
     def optimize_multi_factor(self, base_concept, factors_to_optimize, constraints=None):
         """
         Optimize multiple factors simultaneously
@@ -244,7 +224,7 @@ class NPDOptimizer:
             factors_to_optimize: list of factors to test combinations of
             constraints: dict with optimization constraints
             
-        Returns: 
+        Returns:
             dict: Best combination found
         """
         if constraints is None:
@@ -265,7 +245,7 @@ class NPDOptimizer:
         # Get options for specified factors
         options_to_test = {}
         for factor in factors_to_optimize:
-            if factor in factor_options: 
+            if factor in factor_options:
                 options_to_test[factor] = factor_options[factor]
         
         # Generate all combinations
@@ -285,10 +265,10 @@ class NPDOptimizer:
             
             prob = self.predict_success(test_concept)
             
-            if prob > best_prob: 
+            if prob > best_prob:
                 best_prob = prob
-                best_concept = test_concept. copy()
-        
+                best_concept = test_concept.copy()
+
         if best_concept:
             return {
                 'optimized_concept': best_concept,
@@ -308,7 +288,7 @@ class NPDOptimizer:
         """
         Compare multiple predefined scenarios
         
-        Args: 
+        Args:
             base_concept: dict with base product attributes
             scenarios: list of dicts with scenario modifications
             
@@ -334,7 +314,7 @@ class NPDOptimizer:
             prob = self.predict_success(test_concept)
             
             results.append({
-                'scenario':  f"Scenario {i}",
+                'scenario': f"Scenario {i}",
                 'success_probability': prob,
                 'lift': prob - baseline_prob,
                 'relative_lift_pct': ((prob - baseline_prob) / baseline_prob) * 100 if baseline_prob > 0 else 0,
@@ -354,7 +334,7 @@ def main():
     
     # Load trained model
     print("\n📂 Loading trained model...")
-    predictor = NPDPredictor. load('models/npd_predictor.pkl')
+    predictor = NPDPredictor.load('models/npd_predictor.pkl')
     print("✅ Model loaded")
     
     # Initialize optimizer
@@ -364,26 +344,26 @@ def main():
     test_concept = {
         'protein_type': 'beef',
         'preparation': 'raw',
-        'price_point':  'mid-range',
+        'price_point': 'mid-range',
         'portion_size_g': 250,
         'shelf_life_days': 7,
         'launch_quarter': 'Q2',
-        'target_channel':  'retail_butcher',
+        'target_channel': 'retail_butcher',
         'competitive_products': 8,
-        'trend_alignment':  0.6,
+        'trend_alignment': 0.6,
         'marketing_spend_gbp': 15000,
         'has_sustainability_claim': 0,
         'has_origin_story': 1,
-        'packaging_innovation':  0,
+        'packaging_innovation': 0,
         'development_time_months': 6,
         'testing_iterations': 3,
-        'consultant_involved':  1
+        'consultant_involved': 1
     }
     
     print("\n" + "="*60)
     print("BASE CONCEPT")
     print("="*60)
-    print(f"Product: {test_concept['preparation']. title()} {test_concept['protein_type'].title()}")
+    print(f"Product: {test_concept['preparation'].title()} {test_concept['protein_type'].title()}")
     print(f"Price: {test_concept['price_point'].title()}")
     print(f"Channel: {test_concept['target_channel'].replace('_', ' ').title()}")
     print(f"Marketing: £{test_concept['marketing_spend_gbp']:,}")
@@ -405,7 +385,7 @@ def main():
             print(f"   Improvement: +{rec['lift']*100:.1f} percentage points ({rec['relative_lift_pct']:.1f}% relative)")
             
             if 'investment_required' in rec:
-                print(f"   Investment Required:  £{rec['investment_required']: ,}")
+                print(f"   Investment Required: £{rec['investment_required']:,}")
     else:
         print("✅ This concept is already highly optimized!")
     
@@ -415,7 +395,7 @@ def main():
     print("="*60)
     
     multi_result = optimizer.optimize_multi_factor(
-        test_concept, 
+        test_concept,
         factors_to_optimize=['preparation', 'has_sustainability_claim', 'packaging_innovation']
     )
     
@@ -425,8 +405,8 @@ def main():
         print(f"Improvement: +{multi_result['lift']*100:.1f} percentage points")
         print(f"\nChanges:")
         for factor, value in multi_result['changes_made'].items():
-            print(f"  - {factor}:  {value}")
-    
+            print(f"  - {factor}: {value}")
+
     # Scenario analysis
     print("\n" + "="*60)
     print("SCENARIO ANALYSIS")
@@ -443,7 +423,7 @@ def main():
             'has_origin_story': 1
         },
         {
-            'preparation':  'ready-to-cook',
+            'preparation': 'ready-to-cook',
             'packaging_innovation': 1,
             'marketing_spend_gbp': 25000
         }

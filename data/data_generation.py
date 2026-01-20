@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 import os
 
 # Set random seed for reproducibility
-np. random.seed(42)
+np.random.seed(42)
 
 def generate_npd_data(n_products=300):
     """
@@ -25,7 +25,7 @@ def generate_npd_data(n_products=300):
     Args:
         n_products: Number of product launches to generate
         
-    Returns: 
+    Returns:
         pandas.DataFrame with NPD data
     """
     
@@ -33,8 +33,8 @@ def generate_npd_data(n_products=300):
     
     for i in range(n_products):
         # Product characteristics
-        protein_type = np. random.choice(
-            ['beef', 'pork', 'lamb', 'chicken', 'mixed'], 
+        protein_type = np.random.choice(
+            ['beef', 'pork', 'lamb', 'chicken', 'mixed'],
             p=[0.3, 0.25, 0.15, 0.2, 0.1]
         )
         
@@ -43,7 +43,7 @@ def generate_npd_data(n_products=300):
             p=[0.2, 0.25, 0.2, 0.25, 0.1]
         )
         
-        price_point = np.random. choice(
+        price_point = np.random.choice(
             ['economy', 'mid-range', 'premium'],
             p=[0.3, 0.5, 0.2]
         )
@@ -63,7 +63,7 @@ def generate_npd_data(n_products=300):
         # Marketing factors
         marketing_spend_gbp = np.random.randint(1000, 50000)
         has_sustainability_claim = np.random.choice([0, 1], p=[0.6, 0.4])
-        has_origin_story = np. random.choice([0, 1], p=[0.5, 0.5])
+        has_origin_story = np.random.choice([0, 1], p=[0.5, 0.5])
         packaging_innovation = np.random.choice([0, 1], p=[0.7, 0.3])
         
         # Development factors
@@ -109,7 +109,7 @@ def generate_npd_data(n_products=300):
             success_score += 0.08
         
         # Consultant involvement (expertise helps)
-        if consultant_involved: 
+        if consultant_involved:
             success_score += 0.10
         
         # Channel-specific adjustments
@@ -119,7 +119,7 @@ def generate_npd_data(n_products=300):
             success_score -= 0.05  # Harder to break into
         
         # Seasonal considerations
-        if launch_quarter in ['Q2', 'Q3'] and protein_type in ['beef', 'pork']: 
+        if launch_quarter in ['Q2', 'Q3'] and protein_type in ['beef', 'pork']:
             success_score += 0.05  # BBQ season
         
         # Add realistic noise
@@ -135,12 +135,12 @@ def generate_npd_data(n_products=300):
         if success:
             base_revenue = np.random.normal(90000, 35000)
         else:
-            base_revenue = np.random. normal(25000, 15000)
-        
+            base_revenue = np.random.normal(25000, 15000)
+
         # Premium products have higher revenue potential
         if price_point == 'premium':
             base_revenue *= 1.4
-        elif price_point == 'economy': 
+        elif price_point == 'economy':
             base_revenue *= 0.8
         
         first_year_revenue_gbp = max(0, int(base_revenue))
@@ -149,13 +149,13 @@ def generate_npd_data(n_products=300):
         product = {
             'product_id': f'NPD_{i:03d}',
             'protein_type': protein_type,
-            'preparation':  preparation,
+            'preparation': preparation,
             'price_point': price_point,
             'portion_size_g': portion_size_g,
             'shelf_life_days': shelf_life_days,
             'launch_quarter': launch_quarter,
             'target_channel': target_channel,
-            'competitive_products':  competitive_products,
+            'competitive_products': competitive_products,
             'trend_alignment': round(trend_alignment, 3),
             'marketing_spend_gbp': marketing_spend_gbp,
             'has_sustainability_claim': has_sustainability_claim,
@@ -164,7 +164,7 @@ def generate_npd_data(n_products=300):
             'development_time_months': development_time_months,
             'testing_iterations': testing_iterations,
             'consultant_involved': consultant_involved,
-            'success':  success,
+            'success': success,
             'first_year_revenue_gbp': first_year_revenue_gbp,
             'success_score': round(success_score, 3)  # Hidden - for analysis only
         }
@@ -186,7 +186,7 @@ def main():
     print(f"\n{'='*60}")
     print(f"Dataset Summary")
     print(f"{'='*60}")
-    print(f"Total products:  {len(df)}")
+    print(f"Total products: {len(df)}")
     print(f"Success rate: {df['success'].mean():.1%}")
     print(f"Average first-year revenue (successful): £{df[df['success']==1]['first_year_revenue_gbp'].mean():,.0f}")
     print(f"Average first-year revenue (failed): £{df[df['success']==0]['first_year_revenue_gbp'].mean():,.0f}")
@@ -200,11 +200,10 @@ def main():
     print(f"\n{df['target_channel'].value_counts()}")
     
     # Save to CSV
-    output_path = 'data/synthetic_npd_data. csv'
+    output_path = 'data/synthetic_npd_data.csv'
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df.to_csv(output_path, index=False)
-    print(f"\n✅ Data saved to:  {output_path}")
-    
-    return df
+    print(f"\n✅ Data saved to {output_path}")
 
 
 if __name__ == "__main__":

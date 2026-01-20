@@ -2,7 +2,7 @@
 NPD Success Predictor - Streamlit Application
 
 Interactive web application for predicting and optimizing
-new product development success in butchery and food service. 
+new product development success in butchery and food service.
 """
 
 import streamlit as st
@@ -14,7 +14,7 @@ import sys
 import os
 
 # Add parent directory to path
-sys.path.append(os. path.dirname(os.path. dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.model import NPDPredictor
 from src.optimizer import NPDOptimizer
@@ -34,17 +34,17 @@ st.markdown("""
     .main-header {
         font-size: 2.5rem;
         font-weight: bold;
-        color:  #1f77b4;
+        color: #1f77b4;
         text-align: center;
         margin-bottom: 0.5rem;
     }
-    . sub-header {
+    .sub-header {
         font-size: 1.2rem;
         color: #666;
         text-align: center;
         margin-bottom: 2rem;
     }
-    . metric-card {
+    .metric-card {
         background-color: #f0f2f6;
         padding: 1rem;
         border-radius: 0.5rem;
@@ -54,7 +54,7 @@ st.markdown("""
         background-color: #e8f4f8;
         padding: 1rem;
         border-radius: 0.5rem;
-        margin:  0.5rem 0;
+        margin: 0.5rem 0;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -67,7 +67,7 @@ def load_model():
         predictor = NPDPredictor.load('models/npd_predictor.pkl')
         return predictor
     except:
-        st.error("⚠️ Model not found.  Please train the model first by running:  python src/model. py")
+        st.error("Model not found. Please train the model first by running: python src/model.py")
         return None
 
 
@@ -86,21 +86,21 @@ def create_gauge_chart(value, title="Success Probability"):
         mode="gauge+number",
         value=value * 100,
         domain={'x': [0, 1], 'y': [0, 1]},
-        title={'text':  title, 'font': {'size': 20}},
-        number={'suffix': "%", 'font': {'size':  40}},
+        title={'text': title, 'font': {'size': 20}},
+        number={'suffix': "%", 'font': {'size': 40}},
         gauge={
-            'axis': {'range':  [None, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
-            'bar':  {'color': color},
+            'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
+            'bar': {'color': color},
             'bgcolor': "white",
             'borderwidth': 2,
             'bordercolor': "gray",
             'steps': [
                 {'range': [0, 45], 'color': 'lightcoral'},
                 {'range': [45, 65], 'color': 'lightyellow'},
-                {'range':  [65, 100], 'color': 'lightgreen'}
+                {'range': [65, 100], 'color': 'lightgreen'}
             ],
             'threshold': {
-                'line': {'color':  "red", 'width': 4},
+                'line': {'color': "red", 'width': 4},
                 'thickness': 0.75,
                 'value': 50
             }
@@ -119,19 +119,19 @@ def main():
     """Main application"""
     
     # Header
-    st.markdown('<div class="main-header">🥩 NPD Success Predictor</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">NPD Success Predictor</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">ML-Powered Insights for Butchery & Food Service NPD</div>', unsafe_allow_html=True)
     
     # Load model
     predictor = load_model()
     
     if predictor is None:
-        st. stop()
-    
+        st.stop()
+
     optimizer = NPDOptimizer(predictor)
     
     # Sidebar - Product Configuration
-    st.sidebar.header("🔧 Product Configuration")
+    st.sidebar.header("Product Configuration")
     
     with st.sidebar:
         st.subheader("Product Attributes")
@@ -201,7 +201,7 @@ def main():
         st.subheader("Marketing Strategy")
         
         marketing_spend = st.number_input(
-            "Marketing Budget (£)",
+            "Marketing Budget (GBP)",
             min_value=0,
             max_value=100000,
             value=25000,
@@ -234,26 +234,26 @@ def main():
     
     # Build concept dictionary
     concept = {
-        'protein_type':  protein_type. lower(),
+        'protein_type': protein_type.lower(),
         'preparation': preparation.lower().replace('-', '-'),
-        'price_point':  price_point.lower().replace('-', '-'),
+        'price_point': price_point.lower().replace('-', '-'),
         'portion_size_g': portion_size,
         'shelf_life_days': shelf_life,
         'target_channel': target_channel.lower().replace(' ', '_'),
-        'launch_quarter':  launch_quarter,
+        'launch_quarter': launch_quarter,
         'competitive_products': competitive_products,
-        'trend_alignment':  trend_alignment,
+        'trend_alignment': trend_alignment,
         'marketing_spend_gbp': marketing_spend,
         'has_sustainability_claim': int(has_sustainability),
         'has_origin_story': int(has_origin),
         'packaging_innovation': int(has_packaging),
         'development_time_months': dev_time,
-        'testing_iterations':  testing_iterations,
+        'testing_iterations': testing_iterations,
         'consultant_involved': int(consultant)
     }
     
     # Main content area
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Prediction", "💡 Optimization", "📈 Insights", "ℹ️ About"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Prediction", "Optimization", "Insights", "About"])
     
     with tab1:
         st.header("Success Prediction")
@@ -275,27 +275,27 @@ def main():
             estimated_revenue = success_prob * 120000 + (1 - success_prob) * 25000
             st.metric(
                 "Est. First Year Revenue",
-                f"£{estimated_revenue:,. 0f}"
+                f"GBP:{estimated_revenue:,.0f}"
             )
         
         with col3:
             if success_prob >= 0.65:
-                risk_level = "🟢 Low"
+                risk_level = "Low"
                 risk_color = "green"
             elif success_prob >= 0.45:
-                risk_level = "🟡 Medium"
+                risk_level = "Medium"
                 risk_color = "orange"
             else:
-                risk_level = "🔴 High"
+                risk_level = "High"
                 risk_color = "red"
             
-            st. metric("Risk Level", risk_level)
-        
+            st.metric("Risk Level", risk_level)
+
         # Gauge chart
         st.plotly_chart(create_gauge_chart(success_prob), use_container_width=True)
         
         # Interpretation
-        st.subheader("📋 Interpretation")
+        st.subheader("Interpretation")
         
         if success_prob >= 0.65:
             st.success(f"""
@@ -332,16 +332,16 @@ def main():
         
         # Get recommendations
         with st.spinner("Analyzing optimization opportunities..."):
-            recommendations = optimizer. optimize_product_concept(concept, top_n=10)
-        
+            recommendations = optimizer.optimize_product_concept(concept, top_n=10)
+
         if recommendations:
             st.subheader(f"🎯 Top Recommendations ({len(recommendations)} found)")
             
             for i, rec in enumerate(recommendations, 1):
-                with st.expander(f"#{i}:  {rec['change']}", expanded=(i <= 3)):
-                    
-                    col1, col2 = st. columns(2)
-                    
+                with st.expander(f"#{i}: {rec['change']}", expanded=(i <= 3)):
+
+                    col1, col2 = st.columns(2)
+
                     with col1:
                         st.metric(
                             "New Success Probability",
@@ -360,13 +360,13 @@ def main():
                     new_revenue = rec['new_probability'] * 120000 + (1 - rec['new_probability']) * 25000
                     revenue_lift = new_revenue - baseline_revenue
                     
-                    st. write(f"**Est. Revenue Impact:** +£{revenue_lift:,.0f}")
-                    
+                    st.write(f"**Est. Revenue Impact:** +£{revenue_lift:,.0f}")
+
                     if 'investment_required' in rec:
                         roi = revenue_lift / rec['investment_required'] if rec['investment_required'] > 0 else 0
                         st.write(f"**Investment Required:** £{rec['investment_required']:,}")
-                        st.write(f"**Estimated ROI:** {roi:. 1f}x")
-                    
+                        st.write(f"**Estimated ROI:** {roi:.1f}x")
+
                     # Category badge
                     st.caption(f"Category: `{rec['category']}`")
             
@@ -379,25 +379,25 @@ def main():
                 optimized_concept = concept.copy()
                 changes = []
                 
-                for rec in recommendations[: 3]:
+                for rec in recommendations[:3]:
                     if rec['category'] in ['preparation', 'protein_type', 'price_point', 'target_channel']:
                         optimized_concept[rec['category']] = rec['new_value']
-                    elif rec['category'] == 'sustainability': 
+                    elif rec['category'] == 'sustainability':
                         optimized_concept['has_sustainability_claim'] = 1
                     elif rec['category'] == 'origin_story':
                         optimized_concept['has_origin_story'] = 1
-                    elif rec['category'] == 'packaging': 
+                    elif rec['category'] == 'packaging':
                         optimized_concept['packaging_innovation'] = 1
                     
                     changes.append(rec['change'])
                 
                 optimized_prob = optimizer.predict_success(optimized_concept)
                 
-                col1, col2 = st. columns(2)
-                
+                col1, col2 = st.columns(2)
+
                 with col1:
-                    st.metric("Original Probability", f"{success_prob:. 1%}")
-                
+                    st.metric("Original Probability", f"{success_prob:.1%}")
+
                 with col2:
                     st.metric(
                         "Optimized Probability", 
@@ -413,17 +413,17 @@ def main():
                 """)
         
         else:
-            st.success("✅ This concept is already highly optimized!  No significant improvements found.")
-    
+            st.success("✅ This concept is already highly optimized! No significant improvements found.")
+
     with tab3:
         st.header("Market Insights")
         
         st.subheader("🎯 Success Factors for Butchery & Food Service NPD")
         
-        col1, col2 = st. columns(2)
-        
+        col1, col2 = st.columns(2)
+
         with col1:
-            st. markdown("""
+            st.markdown("""
             **Top Success Drivers:**
             
             1. **Preparation Style** (30% impact)
@@ -460,7 +460,7 @@ def main():
         
         # Create sample trend data
         trend_data = pd.DataFrame({
-            'Quarter':  ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'],
+            'Quarter': ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'],
             'Ready-to-Cook': [45, 52, 58, 63, 68],
             'Marinated': [38, 42, 44, 47, 50],
             'Raw': [55, 52, 48, 45, 42]
@@ -490,16 +490,16 @@ def main():
         st.markdown("""
         ### 🎯 Purpose
         
-        This ML-powered tool helps butchery and food service businesses predict the 
-        success of new product development (NPD) initiatives **before** significant 
-        investment is made. 
+        This ML-powered tool helps butchery and food service businesses predict the
+        success of new product development (NPD) initiatives **before** significant
+        investment is made.
         
         ### 🔬 How It Works
         
-        The prediction model uses **Gradient Boosting**, trained on 300+ historical 
-        product launches, analyzing: 
+        The prediction model uses **Gradient Boosting**, trained on 300+ historical
+        product launches, analyzing:
         
-        - **Product attributes**:  Protein type, preparation, positioning
+        - **Product attributes**: Protein type, preparation, positioning
         - **Market context**: Competition, trends, timing
         - **Marketing strategy**: Budget, claims, differentiation
         - **Development factors**: Timeline, testing, expertise
@@ -520,17 +520,17 @@ def main():
         
         ### 🛠️ Technical Details
         
-        - **Algorithm**:  Gradient Boosting Classifier
+        - **Algorithm**: Gradient Boosting Classifier
         - **Features**: 16 input variables
-        - **Interpretability**:  SHAP values for transparency
+        - **Interpretability**: SHAP values for transparency
         - **Framework**: scikit-learn, XGBoost
         
         ### 📞 Contact
         
-        Built as a proof of concept for Flamande Consultancy. 
+        Built as a proof of concept for Flamande Consultancy.
         
-        For more information or to discuss implementation: 
-        - **Email**:  contact@example.com
+        For more information or to discuss implementation:
+        - **Email**: contact@example.com
         - **GitHub**: [View Repository](https://github.com/ZakChadwick/flamande-npd-ml-poc)
         """)
         

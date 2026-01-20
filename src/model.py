@@ -2,7 +2,7 @@
 NPD Success Prediction Model
 
 Gradient Boosting Classifier for predicting new product development success
-in butchery and food service sectors. 
+in butchery and food service sectors.
 """
 
 import pandas as pd
@@ -10,9 +10,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import LabelEncoder
-from sklearn. metrics import (
-    classification_report, 
-    roc_auc_score, 
+from sklearn.metrics import (
+    classification_report,
+    roc_auc_score,
     confusion_matrix,
     accuracy_score
 )
@@ -20,7 +20,7 @@ import joblib
 import os
 
 
-class NPDPredictor: 
+class NPDPredictor:
     """
     NPD Success Prediction Model
     
@@ -33,7 +33,7 @@ class NPDPredictor:
         self.label_encoders = {}
         self.feature_names = []
         self.categorical_features = [
-            'protein_type', 'preparation', 'price_point', 
+            'protein_type', 'preparation', 'price_point',
             'launch_quarter', 'target_channel'
         ]
         
@@ -41,7 +41,7 @@ class NPDPredictor:
         """
         Encode categorical features and prepare feature matrix
         
-        Args: 
+        Args:
             df: DataFrame with raw features
             
         Returns:
@@ -56,8 +56,8 @@ class NPDPredictor:
                 self.label_encoders[col] = LabelEncoder()
                 df_encoded[col + '_encoded'] = self.label_encoders[col].fit_transform(df[col])
             else:
-                df_encoded[col + '_encoded'] = self.label_encoders[col]. transform(df[col])
-        
+                df_encoded[col + '_encoded'] = self.label_encoders[col].transform(df[col])
+
         # Define feature columns
         feature_cols = [
             'protein_type_encoded', 'preparation_encoded', 'price_point_encoded',
@@ -83,7 +83,7 @@ class NPDPredictor:
             learning_rate: Learning rate
             max_depth: Maximum tree depth
         """
-        self. model = GradientBoostingClassifier(
+        self.model = GradientBoostingClassifier(
             n_estimators=n_estimators,
             learning_rate=learning_rate,
             max_depth=max_depth,
@@ -100,15 +100,15 @@ class NPDPredictor:
         Evaluate model performance
         
         Args:
-            X_test:  Test features
-            y_test:  Test labels
-            
-        Returns: 
+            X_test: Test features
+            y_test: Test labels
+
+        Returns:
             dict: Evaluation metrics
         """
         y_pred = self.model.predict(X_test)
-        y_pred_proba = self. model.predict_proba(X_test)[:, 1]
-        
+        y_pred_proba = self.model.predict_proba(X_test)[:, 1]
+
         metrics = {
             'accuracy': accuracy_score(y_test, y_pred),
             'roc_auc': roc_auc_score(y_test, y_pred_proba),
@@ -178,7 +178,7 @@ class NPDPredictor:
         }
         
         joblib.dump(model_data, filepath)
-        print(f"✅ Model saved to {filepath}")
+        print(f"Model saved to {filepath}")
     
     @classmethod
     def load(cls, filepath='models/npd_predictor.pkl'):
@@ -202,15 +202,15 @@ def main():
     print("="*60)
     
     # Load data
-    print("\n📂 Loading data...")
+    print("\nLoading data...")
     df = pd.read_csv('data/synthetic_npd_data.csv')
-    print(f"✅ Loaded {len(df)} products")
+    print(f"Loaded {len(df)} products")
     
     # Initialize predictor
     predictor = NPDPredictor()
     
     # Prepare features
-    print("\n🔧 Preparing features...")
+    print("\nPreparing features...")
     X, feature_names = predictor.prepare_features(df)
     y = df['success']
     
@@ -219,15 +219,15 @@ def main():
         X, y, test_size=0.25, random_state=42, stratify=y
     )
     
-    print(f"Training set:  {len(X_train)} samples")
+    print(f"Training set: {len(X_train)} samples")
     print(f"Test set: {len(X_test)} samples")
     
     # Train model
-    print("\n🚀 Training model...")
+    print("\nTraining model...")
     predictor.train(X_train, y_train)
     
     # Evaluate
-    print("\n📊 Evaluating model...")
+    print("\nEvaluating model...")
     metrics = predictor.evaluate(X_test, y_test)
     
     print("\n" + "="*60)
@@ -244,48 +244,11 @@ def main():
     print("\n" + "="*60)
     print("FEATURE IMPORTANCE")
     print("="*60)
-    feature_importance = predictor. get_feature_importance()
-    print(feature_importance. head(10))
-    
+    feature_importance = predictor.get_feature_importance()
+    print(feature_importance.head(10))
+
     # Save model
-    predictor. save()
-    
-    # Example prediction
-    print("\n" + "="*60)
-    print("EXAMPLE PREDICTION")
-    print("="*60)
-    
-    example_concept = {
-        'protein_type': 'beef',
-        'preparation': 'marinated',
-        'price_point': 'premium',
-        'portion_size_g': 300,
-        'shelf_life_days': 14,
-        'launch_quarter': 'Q2',
-        'target_channel':  'food_service',
-        'competitive_products': 5,
-        'trend_alignment': 0.75,
-        'marketing_spend_gbp': 25000,
-        'has_sustainability_claim': 1,
-        'has_origin_story': 1,
-        'packaging_innovation': 0,
-        'development_time_months': 6,
-        'testing_iterations':  3,
-        'consultant_involved':  1
-    }
-    
-    prob = predictor.predict_single(example_concept)
-    print(f"\nProduct:  {example_concept['preparation']. title()} {example_concept['protein_type']. title()}")
-    print(f"Price: {example_concept['price_point']. title()}")
-    print(f"Channel: {example_concept['target_channel'].replace('_', ' ').title()}")
-    print(f"\n🎯 Success Probability: {prob:.1%}")
-    
-    if prob > 0.65:
-        print("✅ LOW RISK - Strong market potential")
-    elif prob > 0.45:
-        print("⚠️  MEDIUM RISK - Consider optimizations")
-    else:
-        print("🔴 HIGH RISK - Significant challenges")
+    predictor.save()
 
 
 if __name__ == "__main__":

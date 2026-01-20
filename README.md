@@ -4,7 +4,7 @@
 
 ![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Status](https://img.shields.io/badge/status-POC-yellow. svg)
+![Status](https://img.shields.io/badge/status-POC-yellow.svg)
 
 ---
 
@@ -73,7 +73,7 @@ python data/data_generation.py
 ### Train the Model
 
 ```bash
-python src/model. py
+python src/model.py
 ```
 
 ### Launch Interactive Demo

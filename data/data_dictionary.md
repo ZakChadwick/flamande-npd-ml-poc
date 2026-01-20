@@ -118,7 +118,7 @@ The synthetic data is generated to reflect real-world patterns:
 ```python
 import pandas as pd
 
-df = pd.read_csv('data/synthetic_npd_data. csv')
+df = pd.read_csv('data/synthetic_npd_data.csv')
 ```
 
 ### Filter Successful Products

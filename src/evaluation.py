@@ -21,7 +21,7 @@ def calculate_metrics(y_true, y_pred, y_pred_proba):
     """
     Calculate comprehensive classification metrics
     
-    Args: 
+    Args:
         y_true: True labels
         y_pred: Predicted labels
         y_pred_proba: Predicted probabilities
@@ -52,7 +52,7 @@ def plot_confusion_matrix(y_true, y_pred, save_path=None):
     """
     Plot confusion matrix heatmap
     
-    Args: 
+    Args:
         y_true: True labels
         y_pred: Predicted labels
         save_path: Path to save plot (optional)
@@ -60,7 +60,7 @@ def plot_confusion_matrix(y_true, y_pred, save_path=None):
     cm = confusion_matrix(y_true, y_pred)
     
     plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
                 xticklabels=['Failure', 'Success'],
                 yticklabels=['Failure', 'Success'])
     plt.title('Confusion Matrix', fontsize=14, fontweight='bold')
@@ -68,7 +68,7 @@ def plot_confusion_matrix(y_true, y_pred, save_path=None):
     plt.xlabel('Predicted', fontsize=12)
     
     if save_path:
-        plt. savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"✅ Confusion matrix saved to {save_path}")
     
     plt.tight_layout()
@@ -141,7 +141,7 @@ def plot_calibration_curve(y_true, y_pred_proba, n_bins=10, save_path=None):
     """
     Plot calibration curve to assess probability calibration
     
-    Args: 
+    Args:
         y_true: True labels
         y_pred_proba: Predicted probabilities
         n_bins: Number of bins for calibration
@@ -152,7 +152,7 @@ def plot_calibration_curve(y_true, y_pred_proba, n_bins=10, save_path=None):
     )
     
     plt.figure(figsize=(8, 6))
-    plt.plot(mean_predicted_value, fraction_of_positives, 's-', 
+    plt.plot(mean_predicted_value, fraction_of_positives, 's-',
              linewidth=2, label='Model Calibration')
     plt.plot([0, 1], [0, 1], 'k--', linewidth=1, label='Perfectly Calibrated')
     
@@ -176,7 +176,7 @@ def plot_feature_importance(feature_names, importances, top_n=15, save_path=None
     """
     Plot feature importance bar chart
     
-    Args: 
+    Args:
         feature_names: List of feature names
         importances: Feature importance values
         top_n: Number of top features to display
@@ -204,23 +204,23 @@ def plot_feature_importance(feature_names, importances, top_n=15, save_path=None
     plt.show()
 
 
-def business_impact_analysis(y_true, y_pred, y_pred_proba, 
-                             avg_dev_cost=30000, 
+def business_impact_analysis(y_true, y_pred, y_pred_proba,
+                             avg_dev_cost=30000,
                              avg_success_revenue=90000,
                              avg_failure_revenue=20000):
     """
     Calculate business impact of model predictions
     
-    Args: 
+    Args:
         y_true: True labels
         y_pred: Predicted labels
         y_pred_proba: Predicted probabilities
         avg_dev_cost: Average product development cost
         avg_success_revenue: Average revenue from successful product
-        avg_failure_revenue:  Average revenue from failed product
-        
+        avg_failure_revenue: Average revenue from failed product
+
     Returns:
-        dict:  Business impact metrics
+        dict: Business impact metrics
     """
     # Confusion matrix
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
@@ -231,7 +231,7 @@ def business_impact_analysis(y_true, y_pred, y_pred_proba,
     actual_failures = total_products - actual_successes
     
     baseline_cost = total_products * avg_dev_cost
-    baseline_revenue = (actual_successes * avg_success_revenue + 
+    baseline_revenue = (actual_successes * avg_success_revenue +
                        actual_failures * avg_failure_revenue)
     baseline_profit = baseline_revenue - baseline_cost
     
@@ -256,7 +256,7 @@ def business_impact_analysis(y_true, y_pred, y_pred_proba,
         'savings_from_avoided_failures': savings_from_avoided,
         'lost_opportunity_cost': lost_revenue,
         'net_benefit': (model_profit - baseline_profit),
-        'roi_improvement_pct': ((model_profit - baseline_profit) / abs(baseline_profit) * 100) 
+        'roi_improvement_pct': ((model_profit - baseline_profit) / abs(baseline_profit) * 100)
                                 if baseline_profit != 0 else 0,
         'predicted_launches': predicted_launches,
         'avoided_failures': avoided_failures,
@@ -266,12 +266,12 @@ def business_impact_analysis(y_true, y_pred, y_pred_proba,
     return impact
 
 
-def generate_evaluation_report(y_true, y_pred, y_pred_proba, feature_names=None, 
+def generate_evaluation_report(y_true, y_pred, y_pred_proba, feature_names=None,
                                importances=None, output_dir='evaluation_results'):
     """
     Generate comprehensive evaluation report with plots and metrics
     
-    Args: 
+    Args:
         y_true: True labels
         y_pred: Predicted labels
         y_pred_proba: Predicted probabilities
@@ -290,32 +290,32 @@ def generate_evaluation_report(y_true, y_pred, y_pred_proba, feature_names=None,
     metrics = calculate_metrics(y_true, y_pred, y_pred_proba)
     
     print("\n📊 Classification Metrics:")
-    print(f"  Accuracy:   {metrics['accuracy']:.3f}")
-    print(f"  Precision: {metrics['precision']:.3f}")
-    print(f"  Recall:    {metrics['recall']:.3f}")
-    print(f"  F1-Score:  {metrics['f1_score']:.3f}")
-    print(f"  ROC-AUC:   {metrics['roc_auc']:.3f}")
+    print(f"  Accuracy:    {metrics['accuracy']:.3f}")
+    print(f"  Precision:   {metrics['precision']:.3f}")
+    print(f"  Recall:      {metrics['recall']:.3f}")
+    print(f"  F1-Score:    {metrics['f1_score']:.3f}")
+    print(f"  ROC-AUC:     {metrics['roc_auc']:.3f}")
     print(f"  Specificity: {metrics['specificity']:.3f}")
     
     # Generate plots
     print("\n📈 Generating plots...")
-    plot_confusion_matrix(y_true, y_pred, 
-                         save_path=f'{output_dir}/confusion_matrix. png')
-    plot_roc_curve(y_true, y_pred_proba, 
+    plot_confusion_matrix(y_true, y_pred,
+                         save_path=f'{output_dir}/confusion_matrix.png')
+    plot_roc_curve(y_true, y_pred_proba,
                   save_path=f'{output_dir}/roc_curve.png')
-    plot_precision_recall_curve(y_true, y_pred_proba, 
+    plot_precision_recall_curve(y_true, y_pred_proba,
                                save_path=f'{output_dir}/precision_recall_curve.png')
-    plot_calibration_curve(y_true, y_pred_proba, 
+    plot_calibration_curve(y_true, y_pred_proba,
                           save_path=f'{output_dir}/calibration_curve.png')
     
-    if feature_names and importances:
-        plot_feature_importance(feature_names, importances, 
+    if feature_names is not None and importances is not None:
+        plot_feature_importance(feature_names, importances,
                               save_path=f'{output_dir}/feature_importance.png')
     
     # Business impact
     print("\n💼 Business Impact Analysis:")
     impact = business_impact_analysis(y_true, y_pred, y_pred_proba)
-    print(f"  Baseline Profit:  £{impact['baseline_profit']: ,}")
+    print(f"  Baseline Profit: £{impact['baseline_profit']:,}")
     print(f"  Model-Guided Profit: £{impact['model_profit']:,}")
     print(f"  Profit Improvement: £{impact['profit_improvement']:,}")
     print(f"  ROI Improvement: {impact['roi_improvement_pct']:.1f}%")
@@ -345,8 +345,8 @@ def main():
     df = pd.read_csv('data/synthetic_npd_data.csv')
     
     # Load model
-    predictor = NPDPredictor. load('models/npd_predictor.pkl')
-    
+    predictor = NPDPredictor.load('models/npd_predictor.pkl')
+
     # Prepare features
     X, feature_names = predictor.prepare_features(df)
     y = df['success']

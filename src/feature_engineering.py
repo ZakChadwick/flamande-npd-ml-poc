@@ -12,7 +12,7 @@ def create_interaction_features(df):
     """
     Create interaction features between key variables
     
-    Args: 
+    Args:
         df: DataFrame with base features
         
     Returns:
@@ -22,30 +22,30 @@ def create_interaction_features(df):
     
     # Price x Channel interactions
     df_enhanced['premium_food_service'] = (
-        (df['price_point'] == 'premium') & 
+        (df['price_point'] == 'premium') &
         (df['target_channel'] == 'food_service')
     ).astype(int)
     
     df_enhanced['economy_supermarket'] = (
-        (df['price_point'] == 'economy') & 
+        (df['price_point'] == 'economy') &
         (df['target_channel'] == 'supermarket')
     ).astype(int)
     
     # Preparation x Protein interactions
     df_enhanced['marinated_lamb'] = (
-        (df['preparation'] == 'marinated') & 
+        (df['preparation'] == 'marinated') &
         (df['protein_type'] == 'lamb')
     ).astype(int)
     
     df_enhanced['ready_to_cook_chicken'] = (
-        (df['preparation'] == 'ready-to-cook') & 
+        (df['preparation'] == 'ready-to-cook') &
         (df['protein_type'] == 'chicken')
     ).astype(int)
     
     # Marketing effectiveness (spend relative to price point)
     price_point_map = {'economy': 1, 'mid-range': 2, 'premium': 3}
     df_enhanced['marketing_per_price_tier'] = (
-        df['marketing_spend_gbp'] / df['price_point']. map(price_point_map)
+        df['marketing_spend_gbp'] / df['price_point'].map(price_point_map)
     )
     
     # Competitive intensity
@@ -87,7 +87,7 @@ def create_aggregated_features(df):
         df: DataFrame with base features
         
     Returns:
-        DataFrame:  With aggregated features
+        DataFrame: With aggregated features
     """
     df_enhanced = df.copy()
     
@@ -112,13 +112,13 @@ def create_temporal_features(df, launch_date_col='launch_quarter'):
     
     Args:
         df: DataFrame with temporal information
-        launch_date_col:  Column name for launch timing
-        
+        launch_date_col: Column name for launch timing
+
     Returns:
         DataFrame: With temporal features
     """
-    df_enhanced = df. copy()
-    
+    df_enhanced = df.copy()
+
     # BBQ season flag (Q2, Q3)
     df_enhanced['is_bbq_season'] = df[launch_date_col].isin(['Q2', 'Q3']).astype(int)
     
@@ -135,7 +135,7 @@ def create_risk_indicators(df):
     """
     Create risk indicator features
     
-    Args: 
+    Args:
         df: DataFrame with base features
         
     Returns:
@@ -182,7 +182,7 @@ def normalize_numeric_features(df, numeric_cols=None):
     """
     df_normalized = df.copy()
     
-    if numeric_cols is None: 
+    if numeric_cols is None:
         numeric_cols = df.select_dtypes(include=[np.number]).columns
     
     for col in numeric_cols:
@@ -201,7 +201,7 @@ def create_all_features(df):
     """
     Apply all feature engineering transformations
     
-    Args: 
+    Args:
         df: DataFrame with base features
         
     Returns:
@@ -209,14 +209,9 @@ def create_all_features(df):
     """
     df_enhanced = df.copy()
     
-    # Apply all transformations
     df_enhanced = create_interaction_features(df_enhanced)
     df_enhanced = create_temporal_features(df_enhanced)
     df_enhanced = create_risk_indicators(df_enhanced)
-    
-    # Only create aggregated features if 'success' column exists (training data)
-    if 'success' in df_enhanced.columns:
-        df_enhanced = create_aggregated_features(df_enhanced)
     
     return df_enhanced
 
