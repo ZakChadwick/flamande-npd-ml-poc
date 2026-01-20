@@ -10,6 +10,7 @@ leverages LLM knowledge of real-world food industry patterns.
 
 import os
 import json
+import re
 import time
 import argparse
 from typing import Dict, List, Optional, Tuple
@@ -105,15 +106,21 @@ class LLMDataGenerator:
             LLM response text
         """
         if self.provider == 'openai':
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            # Use response_format only for compatible models (gpt-4-turbo-preview and later)
+            params = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=self.temperature,
-                response_format={"type": "json_object"}
-            )
+                "temperature": self.temperature
+            }
+            
+            # Add JSON mode for compatible models
+            if 'gpt-4' in self.model or 'gpt-3.5-turbo' in self.model:
+                params["response_format"] = {"type": "json_object"}
+            
+            response = self.client.chat.completions.create(**params)
             return response.choices[0].message.content
             
         elif self.provider == 'anthropic':
@@ -191,7 +198,6 @@ class LLMDataGenerator:
                     raise ValueError("Response is not a list or dict with 'products' key")
             except json.JSONDecodeError:
                 # Try to extract JSON array from response
-                import re
                 json_match = re.search(r'\[.*\]', response, re.DOTALL)
                 if json_match:
                     products = json.loads(json_match.group())
@@ -214,6 +220,12 @@ class LLMDataGenerator:
         """
         Estimate API costs for generating products.
         
+        Note: API pricing changes frequently. These estimates are based on 
+        pricing as of January 2024 and should be used as rough guidelines only.
+        Check current pricing at:
+        - OpenAI: https://openai.com/pricing
+        - Anthropic: https://www.anthropic.com/pricing
+        
         Args:
             n_products: Total number of products to generate
             batch_size: Products per API call
@@ -227,7 +239,7 @@ class LLMDataGenerator:
         tokens_per_batch = 3000  # ~1500 input + ~1500 output
         total_tokens = n_batches * tokens_per_batch
         
-        # Cost estimates (as of 2024, subject to change)
+        # Cost estimates (as of January 2024, subject to change)
         if self.provider == 'openai':
             if 'gpt-4' in self.model:
                 cost_per_1k_tokens = 0.03  # Average of input/output
@@ -245,7 +257,8 @@ class LLMDataGenerator:
             'estimated_tokens': total_tokens,
             'estimated_cost_usd': round(estimated_cost, 2),
             'provider': self.provider,
-            'model': self.model
+            'model': self.model,
+            'pricing_date': 'January 2024'
         }
 
 
