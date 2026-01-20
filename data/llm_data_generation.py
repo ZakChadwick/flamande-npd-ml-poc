@@ -19,14 +19,25 @@ from dotenv import load_dotenv
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Import prompt templates
-from data.llm_prompts import (
-    SYSTEM_PROMPT,
-    FEW_SHOT_EXAMPLES,
-    get_single_product_prompt,
-    get_batch_product_prompt,
-    get_validation_prompt,
-    VALIDATION_RULES
-)
+try:
+    from data.llm_prompts import (
+        SYSTEM_PROMPT,
+        FEW_SHOT_EXAMPLES,
+        get_single_product_prompt,
+        get_batch_product_prompt,
+        get_validation_prompt,
+        VALIDATION_RULES
+    )
+except ModuleNotFoundError:
+    # When run as script from data directory
+    from llm_prompts import (
+        SYSTEM_PROMPT,
+        FEW_SHOT_EXAMPLES,
+        get_single_product_prompt,
+        get_batch_product_prompt,
+        get_validation_prompt,
+        VALIDATION_RULES
+    )
 
 # Load environment variables
 load_dotenv()
